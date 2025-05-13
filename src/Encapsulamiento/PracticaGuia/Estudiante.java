@@ -4,10 +4,12 @@ public class Estudiante {
     private String nombre;
     private String materia;
     private double nota1, nota2, nota3, promedio;
+    private String id;
 
     public Estudiante() {}
 
-    public Estudiante(String nombre, String materia, double nota1, double nota2, double nota3, double promedio) {
+    public Estudiante(String id, String nombre, String materia, double nota1, double nota2, double nota3, double promedio) {
+        this.id = id;
         this.nombre = nombre;
         this.materia = materia;
         this.nota1 = nota1;
@@ -15,6 +17,9 @@ public class Estudiante {
         this.nota3 = nota3;
         this.promedio = promedio;
     }
+
+    public String getId(){return id;}
+    public void setId(String id){this.id = id;}
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
