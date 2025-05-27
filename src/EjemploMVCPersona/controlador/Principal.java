@@ -1,8 +1,8 @@
-package TallerIMC;
+package EjemploMVCPersona.controlador;
+
 
 public class Principal {
     public static void main(String[] args) {
-        Procesos miProceso = new Procesos();
-
+    	new Relaciones();
     }
 }
