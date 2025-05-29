@@ -11,25 +11,25 @@ public class LogicaIMC {
     }
 
     public double calcularIMC(PersonaDTO persona) {
-        if (persona.getAltura() <= 0) {
-            throw new IllegalArgumentException("La altura debe ser mayor a 0");
-        }
-        return persona.getPeso() / (persona.getAltura() * persona.getAltura());
+        double imc = persona.getPeso() / (persona.getAltura() * persona.getAltura());
+        return imc;
     }
 
     public String clasificarIMC(double imc) {
-        if (imc < 18.5) {
-            return "Bajo peso";
-        } else if (imc >= 18.5 && imc < 25) {
-            return "Normal";
-        } else if (imc >= 25 && imc < 30) {
-            return "Sobrepeso";
-        } else if (imc >= 30 && imc < 35) {
-            return "Obesidad grado I";
-        } else if (imc >= 35 && imc < 40) {
-            return "Obesidad grado II";
+        if (imc<18){
+            return  "Tiene Anorexia";
+        }else if (imc>=18 && imc<20){
+            return  "Tiene Delgadez";
+        }else if (imc>=20 && imc<27){
+            return  "Tiene Normalidad";
+        }else if (imc>=27 && imc<30) {
+            return  "Tiene Obsidad (Grado 1)";
+        }else if (imc>=30 && imc<35) {
+            return  "Tiene Obsidad (Grado 2)";
+        }else if (imc>=35 && imc<40) {
+            return  "Tiene Obsidad (Grado 3)";
         } else {
-            return "Obesidad grado III (mórbida)";
+            return  "Tiene Obsidad Morbida";
         }
     }
 

@@ -1,6 +1,7 @@
 package EjemploIMC.VIsta;
 
 import EjemploIMC.Controlador.Coordinador;
+import EjemploIMC.Modelo.Logica.LogicaIMC;
 import EjemploIMC.Modelo.dto.PersonaDTO;
 
 import javax.swing.*;
@@ -20,6 +21,8 @@ public class VentanaRegistro extends JDialog implements ActionListener {
     private JTextField txtAltura;
     private JButton btnRegistrar;
     private JButton btnCancelar;
+    private JButton btnActualizar;
+    private JButton btnBuscar;
 
     public VentanaRegistro(VentanaPrincipal parent, boolean modal) {
         super(parent, modal);
@@ -47,8 +50,13 @@ public class VentanaRegistro extends JDialog implements ActionListener {
         contentPane.add(lblDocumento);
 
         txtDocumento = new JTextField();
-        txtDocumento.setBounds(160, 70, 200, 25);
+        txtDocumento.setBounds(160, 70, 180, 25);
         contentPane.add(txtDocumento);
+
+        btnBuscar = new JButton("Buscar");
+        btnBuscar.setBounds(350, 70, 80, 25);
+        btnBuscar.addActionListener(this);
+        contentPane.add(btnBuscar);
 
         JLabel lblNombre = new JLabel("Nombre:");
         lblNombre.setBounds(50, 110, 100, 25);
@@ -83,9 +91,14 @@ public class VentanaRegistro extends JDialog implements ActionListener {
         contentPane.add(txtAltura);
 
         btnRegistrar = new JButton("Registrar");
-        btnRegistrar.setBounds(100, 290, 100, 30);
+        btnRegistrar.setBounds(30, 290, 100, 30);
         btnRegistrar.addActionListener(this);
         contentPane.add(btnRegistrar);
+
+        btnActualizar = new JButton("Actualizar");
+        btnActualizar.setBounds(140, 290, 100, 30);
+        btnActualizar.addActionListener(this);
+        contentPane.add(btnActualizar);
 
         btnCancelar = new JButton("Cancelar");
         btnCancelar.setBounds(250, 290, 100, 30);
@@ -103,7 +116,84 @@ public class VentanaRegistro extends JDialog implements ActionListener {
         txtEdad.setText("");
         txtPeso.setText("");
         txtAltura.setText("");
+        btnActualizar.setEnabled(false);
+        btnRegistrar.setEnabled(true);
+        txtDocumento.setEditable(true);
     }
+
+    private void buscarPersona() {
+        String documento = txtDocumento.getText().trim();
+
+        PersonaDTO persona = miCoordinador.consultarPersona(documento);
+
+        if (persona != null) {
+            txtDocumento.setText(persona.getDocumento());
+            txtNombre.setText(persona.getNombre());
+            txtEdad.setText(String.valueOf(persona.getEdad()));
+            txtPeso.setText(String.valueOf(persona.getPeso()));
+            txtAltura.setText(String.valueOf(persona.getAltura()));
+
+
+            JOptionPane.showMessageDialog(this, "Persona encontrada. Puede modificar los datos y presionar 'Actualizar'");
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontró ninguna persona con el documento: " + documento);
+            // Limpiar campos excepto el documento para permitir registro nuevo
+            txtNombre.setText("");
+            txtEdad.setText("");
+            txtPeso.setText("");
+            txtAltura.setText("");
+            btnActualizar.setEnabled(true);
+            btnRegistrar.setEnabled(true);
+        }
+    }
+
+    private void actualizarPersona() {
+        try {
+            String documento = txtDocumento.getText().trim();
+            String nombre = txtNombre.getText().trim();
+            int edad = Integer.parseInt(txtEdad.getText().trim());
+            double peso = Double.parseDouble(txtPeso.getText().trim());
+            double altura = Double.parseDouble(txtAltura.getText().trim());
+
+            // Validar datos
+            if (nombre.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "El nombre es obligatorio");
+                return;
+            }
+            if (peso <= 0) {
+                JOptionPane.showMessageDialog(this, "El peso debe ser mayor a 0");
+                return;
+            }
+            if (altura <= 0) {
+                JOptionPane.showMessageDialog(this, "La altura debe ser mayor a 0");
+                return;
+            }
+            if (edad <= 0) {
+                JOptionPane.showMessageDialog(this, "La edad debe ser mayor a 0");
+                return;
+            }
+
+            // Crear persona con datos actualizados
+            PersonaDTO persona = new PersonaDTO(documento, nombre, edad, peso, altura);
+
+//             Usar el método actualizar del coordinador
+            String resultado = miCoordinador.actualizarPersona(persona);
+
+            JOptionPane.showMessageDialog(this, resultado);
+
+            if (resultado.contains("exitosamente")) {
+                limpiarCampos();
+                this.setVisible(false);
+            }
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Error: Verifique que los datos numéricos estén correctos");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error inesperado: " + ex.getMessage());
+        }
+    }
+
+
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -115,9 +205,33 @@ public class VentanaRegistro extends JDialog implements ActionListener {
                 double peso = Double.parseDouble(txtPeso.getText().trim());
                 double altura = Double.parseDouble(txtAltura.getText().trim());
 
-                PersonaDTO persona = new PersonaDTO(documento, nombre, edad, peso, altura);
-                String resultado = miCoordinador.registrarPersona(persona);
+                // Validar datos
+                if (documento.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "El documento es obligatorio");
+                    return;
+                }
+                if (nombre.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "El nombre es obligatorio");
+                    return;
+                }
+                if (peso <= 0) {
+                    JOptionPane.showMessageDialog(this, "El peso debe ser mayor a 0");
+                    return;
+                }
+                if (altura <= 0) {
+                    JOptionPane.showMessageDialog(this, "La altura debe ser mayor a 0");
+                    return;
+                }
+                if (edad <= 0) {
+                    JOptionPane.showMessageDialog(this, "La edad debe ser mayor a 0");
+                    return;
+                }
 
+                // Crear persona
+                PersonaDTO persona = new PersonaDTO(documento, nombre, edad, peso, altura);
+
+                // Registrar usando el coordinador
+                String resultado = miCoordinador.registrarPersona(persona);
                 JOptionPane.showMessageDialog(this, resultado);
 
                 if (resultado.contains("exitosamente")) {
@@ -130,9 +244,11 @@ public class VentanaRegistro extends JDialog implements ActionListener {
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Error inesperado: " + ex.getMessage());
             }
-        } else if (e.getSource() == btnCancelar) {
-            limpiarCampos();
-            this.setVisible(false);
+        } else if (e.getSource() == btnBuscar) {
+            buscarPersona();
+
+        } else if (e.getSource() == btnActualizar) {
+                actualizarPersona();
         }
     }
 }

@@ -150,4 +150,49 @@ public class Coordinador {
             return "Error al calcular IMC: " + e.getMessage();
         }
     }
+
+    public String actualizarPersona(PersonaDTO persona) {
+        try {
+            // Validar datos
+            if (persona.getNombre() == null || persona.getNombre().trim().isEmpty()) {
+                return "El nombre es obligatorio";
+            }
+            if (persona.getDocumento() == null || persona.getDocumento().trim().isEmpty()) {
+                return "El documento es obligatorio";
+            }
+            if (persona.getPeso() <= 0) {
+                return "El peso debe ser mayor a 0";
+            }
+            if (persona.getAltura() <= 0) {
+                return "La altura debe ser mayor a 0";
+            }
+            if (persona.getEdad() <= 0) {
+                return "La edad debe ser mayor a 0";
+            }
+
+            // Verificar si la persona existe
+            if (!miPersonaDAO.existePersona(persona.getDocumento())) {
+                return "La persona con ese documento no existe";
+            }
+
+            // Calcular nuevo IMC
+            double imc = procesos.calcularIMC(persona);
+            String clasificacion = procesos.clasificarIMC(imc);
+            persona.setImc(imc);
+            persona.setClasificacion(clasificacion);
+
+            // Actualizar usando PersonaDao
+            boolean actualizado = miPersonaDAO.actualizarPersona(persona);
+
+            if (actualizado) {
+                return "Persona actualizada exitosamente\nIMC: " + String.format("%.2f", imc) +
+                        "\nClasificación: " + clasificacion;
+            } else {
+                return "Error al actualizar la persona";
+            }
+
+        } catch (Exception e) {
+            return "Error al actualizar: " + e.getMessage();
+        }
+    }
 }
